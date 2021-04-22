@@ -1,5 +1,13 @@
+*{
+  margin: 0;
+}
 body {
   margin: 0;
+  Black:#040402;
+  --light-black:#191919;
+  --red:#ff5757;
+  --purple:#9e91ec;
+  --yellow:#ff8c00;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
