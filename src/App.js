@@ -7,11 +7,13 @@ import {
 import Header from './components/Header';
 import './App.css';
 import  styled  from 'styled-components';
-import Slidebar from './components/Sidebar';
-import Chat from './components/chat';
+import Sidebar from './components/Sidebar';
+import Chat from './components/Chat';
 import {useAuthState} from 'react-firebase-hooks/auth'
 import { auth } from './firebase';
 import Login from './components/Login';
+import Welcome from './components/Welcome';
+
 function App(){
   const [user, loading] = useAuthState(auth);
   return (
@@ -23,11 +25,10 @@ function App(){
           <>
       <Header/>
       <AppBody>
-        <Slidebar></Slidebar>
+        <Sidebar />
         <Switch>
-          <Route path="/" exact>
-            <Chat/>
-            </Route>
+          <Route exact path='/' component={Welcome} />
+          <Route path="/channels/:channelId" component={Chat} />
         </Switch>
         </AppBody>
         </>

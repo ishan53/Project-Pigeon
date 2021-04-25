@@ -1,20 +1,24 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components';
 import {Button} from "@material-ui/core";
 import { auth, provider } from '../firebase';
 function Login() {
-const signIn = e =>{
-    e.preventDefault();
-    auth.signInWithPopup(provider).catch((error) =>
-        alert(error.message));
-};
+    const [loading, setLoading] = useState(false);
+    
+    const signIn = e =>{
+        e.preventDefault();
+        setLoading(true);
+        auth.signInWithPopup(provider).catch((error) =>
+            alert(error.message));
+        setLoading(false);
+    };
     return (
         <LoginContainer>
             <LoginInnerContainer>
-                <img src = "https://t4.ftcdn.net/jpg/02/48/71/57/360_F_248715774_zv7t5GdM2PpX0AxNizQ6DZYznMbi1Lbq.jpg"/>
+                <img src = "../icon.png"/>
                 <h1>Sign in to the Pigeon</h1>
             <p>www.Pigeon.com</p>
-            <Button onClick={signIn}>Sign in with Google</Button>
+            <Button disabled={loading} onClick={signIn}>Sign in with Google</Button>
             </LoginInnerContainer>
         </LoginContainer>
     )

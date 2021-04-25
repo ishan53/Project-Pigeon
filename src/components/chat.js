@@ -1,40 +1,50 @@
 import { InfoOutlined, StarBorderOutlined } from '@material-ui/icons';
-import React from 'react';
-import {useCollection, useDocument } from 'react-firebase-hooks/firestore';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { selectRoomId } from '../features/appSlice';
-import { db } from '../firebase';
-import ChatInput from './ChatInput'
+import { db, auth } from '../firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useParams } from 'react-router';
+import './Chat.css';
+import firebase from 'firebase';
+import Button from '@material-ui/core/Button/Button';
+
+
 function Chat() {
-    const roomId = useSelector(()=>{
-        if(selectRoomId){
-            return selectRoomId;
+
+    const [user] = useAuthState(auth);
+    const [ input, setInput ] = useState('');
+    const [channelName, setChannelName] = useState('');
+    const { channelId } = useParams();
+    const [ messages, setMessages ] = useState([]);
+
+    useEffect(() => {
+        if(channelId) {
+            db.collection('channels').doc(channelId).onSnapshot((snapshot) => (
+                setChannelName(snapshot.data().name)
+            ));
+            db.collection('channels').doc(channelId).collection('messages')
+                .orderBy('timestamp','asc').onSnapshot((snapshot) => 
+                setMessages(snapshot.docs.map((doc) => doc.data())));
         }
-        else{
-            return " ";
-        }
-    });
-    // const [roomDetails] = useDocument(
-    //     roomId && db.collection('rooms').doc(roomId)
-    // )
-    // const [roomMessages] = useCollection(
-    //     roomId && 
-    //     db
-    //     .collection('rooms')
-    //     .doc(roomId)
-    //     .collection('messages')
-    //     .orderBy("timestamp","asc")
-    // );
-    // console.log(roomDetails);
-    // console.log(roomMessages);
+    }, [channelId]);
+
+    const sendMessage = (e) => {
+        e.preventDefault();
+        setInput('');
+        db.collection('channels').doc(channelId).collection('messages').add({
+            message: input,
+            name: user.displayName,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+    }
+
     return (
     <ChatContainer>
         <>
         <Header>
             <HeaderLeft>
                 <h4>
-                    <strong>#Room-name</strong>
+                    <strong># {channelName}</strong>
                 </h4>
                 <StarBorderOutlined/>
             </HeaderLeft>
@@ -44,12 +54,30 @@ function Chat() {
                 </p>
             </HeaderRight>
         </Header>
-        <ChatMessages>
-
+        <ChatMessages className="chat_body">
+            {messages.map((message) => (
+                <p key={message._id} className={`chat_message 
+                    ${message.name === user.displayName && 'chat_reciever'}`}>
+                    <span className="chat_name">
+                        {message.name}
+                    </span>
+                    {message.message}
+                    <span className="chat_timestamp">
+                        {new Date(message.timestamp?.toDate()).toUTCString()}
+                    </span>
+                </p>
+            ))}
         </ChatMessages>
-        <ChatInput
-        channelId={roomId}
-        />
+        
+        <ChatInputContainer>
+            <form onSubmit={sendMessage}>
+                <input value = {input} onChange={e => setInput(e.target.value)} placeholder={`Message #ROOM`}/>
+                <Button hidden type='submit'>
+                    SEND
+                </Button>
+            </form>
+        </ChatInputContainer>
+
         </>
     </ChatContainer>
     )
@@ -66,6 +94,7 @@ const Header = styled.div`
 display:flex;
 justify-content:space-between;
 padding:20px;
+background-color: #EDEDED;
 border-bottom:1px solid lightgray;
 `;
 const HeaderLeft = styled.div`
@@ -94,4 +123,23 @@ const HeaderRight = styled.div`
 }
 `;
 const ChatMessages = styled.div``;
-// const ChatInput = styled.div``;
+const ChatInputContainer = styled.div`
+border-radius:20px;
+>form{
+    position:relative;
+    display:flex;
+    justify-content:center;
+}
+>form > input{
+    position:fixed;
+    bottom:30px;
+    width:60%;
+    border: 2px solid var(--yellow);
+    border-radius: 3px;
+    padding:20px;
+    outline:none;
+}
+>form >button{
+    display:none !important;
+}
+`;

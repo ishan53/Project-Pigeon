@@ -1,40 +1,45 @@
 import React from 'react'
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { enterRoom } from '../features/appSlice';
+import { enterChannel } from '../features/appSlice';
 import { db } from '../firebase';
-function SidebarOptions({Icon, title,addChannelOption, id}) {
-    const dispatch = useDispatch();
+import { Link } from 'react-router-dom';
+
+function SidebarOptions({ Icon, title,addChannelOption, id, isChannel }) {
     const addChannel = () =>{
         const channelName = prompt('Please enter the channel name');
 
         if(channelName){
-            db.collection('rooms').add({
+            db.collection('channels').add({
                 name:channelName,
             });
         }
     };
-    const selectChannel = () =>{
-        if(id){
-            dispatch(enterRoom({
-                roomId: id,
-            }))
-            // console.log(id);
-        }
-    };
-    return (
-        <SidebarOptionsContainer
-        onClick={addChannelOption?addChannel:selectChannel}>
-            {Icon && <Icon fontSize="small" style={{padding:10}} />}
-            {Icon?(
-                <h3>{title}</h3>
-            ):(
-                <SidebarOptionsChannel>
-                    <span>#</span>{title}
-                </SidebarOptionsChannel>
-            )}
+
+    if(addChannelOption) return (
+        <SidebarOptionsContainer onClick={addChannel}>
+            <Icon fontSize="small" style={{padding:10}} />
+            <h3>{title}</h3>
         </SidebarOptionsContainer>
-    )
+    );
+
+    if(isChannel) return (
+        <SidebarOptionsContainer>
+                <SidebarOptionsChannel>
+                    <Link to={`/channels/${id}`} style={{color: "black", textDecoration: "none", padding: "10px"}}>
+                        <span style={{paddingRight: "10px"}}>#</span>{title}
+                    </Link>
+                </SidebarOptionsChannel>
+        </SidebarOptionsContainer>
+    );
+
+    return (
+        <SidebarOptionsContainer>
+                <SidebarOptionsChannel>
+                    <span style={{paddingRight: "10px"}}>#</span>{title}
+                </SidebarOptionsChannel>
+        </SidebarOptionsContainer>
+    );
 }
 
 export default SidebarOptions;
@@ -59,4 +64,5 @@ cursor:pointer;
 const SidebarOptionsChannel = styled.h3`
 padding:10px 0;
 font-weight:300;
+text-decoration: none;
 `;

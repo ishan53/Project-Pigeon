@@ -5,8 +5,13 @@ import AccessTimeIcon from "@material-ui/icons/AccessTime";
 import SearchIcon from '@material-ui/icons/Search';
 import HelpOutlineIcon from '@material-ui/icons/HelpOutline';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import { auth } from '../firebase';
+
 function Header() {
+    const logout = () => {
+        auth.signOut();
+    }
     const [user] = useAuthState(auth);
     return <HeaderContainer>
         {/* Header Left */}
@@ -26,6 +31,7 @@ function Header() {
      {/* HeaderRight */}
     <HeaderRight>
         <HelpOutlineIcon/>
+        <ExitToAppIcon onClick={logout} />
     </HeaderRight>
     </HeaderContainer>
 }
@@ -57,9 +63,10 @@ width:100%;
 align-items:center;
 justify-content:space-between;
 padding:10px 0;
-background-color:var(--purple);
+background-color: #38B6FF;
 color:white;
 border-bottom:2px solid var(--yellow);
+z-index: 5;
 `;
 const HeaderLeft = styled.div`
 flex:0.3;
@@ -75,7 +82,7 @@ margin-left:20px;
 `;
 
 const HeaderRight = styled.div`
-    flex:0.3;
+    flex:0.1;
     display:flex;
     align-items:flex-end;
     >.MuiSvgIcon-root{

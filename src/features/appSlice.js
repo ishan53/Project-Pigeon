@@ -3,17 +3,17 @@ import { createSlice } from '@reduxjs/toolkit';
 export const appSlice = createSlice({
   name: 'app',
   initialState:{
-      roomId:null,
+      channelId:null,
   },
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
     enterRoom: (state, action) => {
-      state.roomId = action.payload.roomId;
+      state.channelId = action.payload.channelId;
     },
     },
 });
 
-export const { enterRoom } = appSlice.actions;
-export const selectRoomId = (state) => state.app.roomId;
+export const { enterChannel } = appSlice.actions;
+export const selectRoomId = (state) => state.app.channelId;
 
 export default appSlice.reducer;

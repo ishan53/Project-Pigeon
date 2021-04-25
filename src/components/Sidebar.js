@@ -13,17 +13,20 @@ import AppsIcon from "@material-ui/icons/Apps";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import AddIcon from "@material-ui/icons/Add"
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollection } from 'react-firebase-hooks/firestore';
+
 function Sidebar() {
-    const [channels, loading, error] = useCollection(db.collection("rooms"));
+    const [channels, loading, error] = useCollection(db.collection("channels"));
+    const [user] = useAuthState(auth);
     return  (<SidebarContainer>
         <SidebarHeader>
             <SidebarInfo>
-            <h2>Pegion</h2>
+            <h2>Pigeon</h2>
             <h3>
                 <FiberManualRecordIcon/>
-                Ishan Singhal
+                {user.displayName}
             </h3>
             </SidebarInfo>
             <CreateIcon/>
@@ -41,15 +44,15 @@ function Sidebar() {
         <hr/>
         <SidebarOptions Icon={AddIcon} addChannelOption title="Add Channel"/>
         {channels?.docs.map(doc => (
-        <SidebarOptions key={doc.id} id={doc.id} title={doc.data().name}/>
+        <SidebarOptions key={doc.id} id={doc.id} title={doc.data().name} isChannel={true}/>
         ))}
     </SidebarContainer>)
 }
 
 export default Sidebar
 const SidebarContainer = styled.div`
-color:white;
-background-color:var(--purple);
+color:black;
+background-color: #38B6FF;
 flex:0.3;
 border:2px solid var(--yellow);
 max-width: 260px;
